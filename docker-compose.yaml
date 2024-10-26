@@ -31,7 +31,36 @@ services:
         - document_rag
       env_file:
         - backend/.env
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: document_rag_grafana
+    ports:
+      - "3001:3000"  # Changed to 3001 since 3000 is used by frontend
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    networks:
+      - document_rag
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=your_secure_password
+    depends_on:
+      - prometheus
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: document_rag_prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    networks:
+      - document_rag
   
 networks:
   document_rag:
     driver: bridge
+
+volumes:
+  grafana-storage:
+  prometheus-data:
