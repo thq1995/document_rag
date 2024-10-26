@@ -1,0 +1,37 @@
+services:
+  document_rag_frontend:
+      build:
+        context: ./frontend
+        dockerfile: Dockerfile
+      image: document_rag_frontend:latest
+      container_name: document_rag_frontend
+      ports:
+        - "3000:3000"
+      volumes:
+        - ./frontend:/app
+      networks:
+        - document_rag
+      depends_on:
+        - document_rag_backend
+      env_file:
+        - frontend/.env
+      
+  document_rag_backend:
+      build:
+        context: ./backend
+        dockerfile: Dockerfile
+      image: document_rag_api:latest
+      container_name: document_rag_backend
+      ports:
+        - "8000:8000"
+      volumes:
+        - ./backend:/app
+        - ./backend/db:/app/data
+      networks:
+        - document_rag
+      env_file:
+        - backend/.env
+  
+networks:
+  document_rag:
+    driver: bridge
